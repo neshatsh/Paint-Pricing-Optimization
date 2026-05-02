@@ -35,6 +35,7 @@ following columns:
 The notebook has all cell outputs saved so the full analysis is 
 readable without running the code.
 
+---
 
 ## What I found
 
