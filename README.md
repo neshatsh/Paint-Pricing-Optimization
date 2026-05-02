@@ -11,6 +11,7 @@ SKU D (Exterior Premium) be set at to maximise total gross margin
 
 The short answer: the current prices aren't optimal, and there's 
 meaningful money being left on the table.
+
 ---
 ## Data 
 The dataset was synthetically generated to simulate realistic retail 
