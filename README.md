@@ -1,4 +1,4 @@
-# Paint Pricing Optimisation
+# Paint Pricing Optimization
 
 I've always been curious about how retail chains set prices — and whether 
 the answer is usually "someone made a spreadsheet in 2015 and nobody's 
@@ -47,15 +47,15 @@ readable without running the code.
 | Conservative gain | +$0.57M / yr | +$1.27M / yr |
 | Full gain | +$1.65M / yr | +$3.37M / yr |
 
-Combined that's +$1.83M/yr from the conservative prices, and a potential +$5.02M/yr at the model optimum — assuming the experiment validates the demand holds.
+Combined, that's +$1.83M/yr from the conservative prices, and a potential +$5.02M/yr at the model optimum — assuming the experiment validates the demand holds.
 
 ---
 
 ## The data was messier than it looked
 
-Before I ran a single model I spent time understanding what was actually in the data. A few things stood out.
+Before I ran a single model, I spent time understanding what was actually in the data. A few things stood out.
 
-**SKU B had only 4 unique prices over 2.5 years.** Essentially one price for the entire period with a few exceptions. It had never really been tested at different price points, which makes standard elasticity estimation pretty fragile — there's just not enough variation to draw a reliable demand curve from.
+**SKU B had only 4 unique prices over 2.5 years.** Essentially one price for the entire period, with a few exceptions. It had never really been tested at different price points, which makes standard elasticity estimation pretty fragile — there's just not enough variation to draw a reliable demand curve from.
 
 **SKU D had a seasonal pricing problem.** Prices were set 12% higher in summer, which is also when exterior paint demand naturally peaks. This creates an endogeneity issue: OLS sees high prices and high demand together every summer and partially concludes the product is price-insensitive, when really both are just driven by the season. I used a quasi-experiment to get around this.
 
@@ -67,13 +67,13 @@ Before I ran a single model I spent time understanding what was actually in the 
 
 I layered four methods on top of each other, each one addressing something the previous one couldn't.
 
-**OLS first** — quick interpretable elasticity estimates. Log-log specification so the coefficient is directly the elasticity. R² of 7% confirmed this was just a starting point. Elasticity: SKU B = -0.341, SKU D = -0.640.
+**OLS first** — quick interpretable elasticity estimates. Log-log specification, so the coefficient is directly the elasticity. R² of 7% confirmed this was just a starting point. Elasticity: SKU B = -0.341, SKU D = -0.640.
 
 **XGBoost for the actual demand model** — with store encoding, seasonal features, and inventory. R² jumped to 86–92%. I validated on 2023 data after training on everything before it, and performance held up, which means the model is learning real patterns rather than memorising the training period.
 
-For price optimisation I swept across a defensible range — cost × 1.05 as the floor, 25% above the historical maximum as the ceiling — and found the price that maximised margin. Both SKUs kept rising to the ceiling, which is interesting in itself.
+For price optimization, I swept across a defensible range — cost × 1.05 as the floor, 25% above the historical maximum as the ceiling — and found the price that maximised margin. Both SKUs kept rising to the ceiling, which is interesting in itself.
 
-**Quasi-experiment for causal credibility** — on days where different stores happened to charge different prices for the same SKU, I used the cheaper stores as a natural control group. Comparing stores on the same day eliminates seasonal confounding automatically. For SKU D this gave an elasticity of -0.866 versus OLS's -0.640 — a meaningful gap that confirms the seasonal bias concern. For SKU B the two were close (-0.410 vs -0.341), suggesting OLS is reliable there.
+**Quasi-experiment for causal credibility** — on days when different stores happened to charge different prices for the same SKU, I used the cheaper stores as a natural control group. Comparing stores on the same day eliminates seasonal confounding automatically. For SKU D, this gave an elasticity of -0.866 versus OLS's -0.640 — a meaningful gap that confirms the seasonal bias concern. For SKU B, the two were close (-0.410 vs -0.341), suggesting OLS is reliable there.
 
 **Segmented elasticity to look for heterogeneity** — I ran the OLS separately on each store revenue tier and found a 20x difference in price sensitivity:
 
@@ -92,7 +92,7 @@ High-revenue stores are barely sensitive to price at all. Low-revenue stores are
 
 One thing I wanted to check before recommending a price increase on SKU D was whether it would push customers toward cheaper alternatives. The cross-price elasticity to SKU E was +0.528 and to SKU F was +0.232 — so yes, some customers do switch.
 
-But the switching customers don't leave the store. SKU E generates $20.04 margin per unit, SKU F generates $12.46. The portfolio optimum including all three exterior SKUs agreed with the isolated optimum at $78. Cannibalization here is actually margin-positive.
+But the switching customers don't leave the store. SKU E generates a $20.04 margin per unit, SKU F generates $12.46. The portfolio optimum, including all three exterior SKUs, agreed with the isolated optimum at $78. Cannibalization here is actually margin-positive.
 
 ---
 
